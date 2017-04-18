@@ -1,26 +1,47 @@
-var app = angular.module('rereddit', ['ui.router']);
+const app = angular.module('rereddit', ['ui.router']);
 
-app.config(function($stateProvider, $urlRouterProvider, $locationProvider) {
+app.config(["$stateProvider", "$urlRouterProvider", "$locationProvider", function ($stateProvider, $urlRouterProvider, $locationProvider) {
+    $locationProvider.html5Mode(true);
 
-  $locationProvider.html5Mode(true);
+    $stateProvider
+        .state('home', {
+            url: '/home',
+            templateUrl: '/templates/home.html',
+            controller: 'PostController',
+            resolve: {
+                posts: function ($http) { // posts es lo que vamos a usar en el postController para acceder a la data
+                    return $http.get('/post'); // post es la ruta que le dimos en el server.js
+                }
+            }
+        })
 
-  $stateProvider
-    .state('home', {
-      url: '/home',
-      templateUrl: '/templates/home.html',
-      controller: 'PostController'
-    })
-    .state('comment', {
-      url: '/post/:id',
-      templateUrl: '/templates/comments.html',
-      controller: 'CommentController'
-    })
-    .state('login', {
-      url: '/login',
-      templateUrl: '/templates/login.html',
-      controller: 'AuthController'
-    });
+        .state('comment', {
+            url: '/posts/:id',
+            templateUrl: '/templates/comments.html',
+            controller: 'CommentController',
+            resolve: {
+                relevantPost: ["postFactory", "$stateParams", "$http", function (postFactory, $stateParams, $http) {
+                    var postId = $stateParams.id;
+                    return $http.get("/post/" + postId).then(function (theWholePost) {
+                        // console.log("the next obj comes from app.js");
+                        // console.log(theWholePost.data);
+                        return theWholePost.data;
+                    })
+                }]
+            }
+        })
 
-  $urlRouterProvider.otherwise('home');
+        .state('login', {
+            url: '/login',
+            templateUrl: '/templates/login.html',
+            controller: 'AuthController'
+        })
+        .state('register', {
+            url: '/register',
+            templateUrl: '/templates/register.html',
+            controller: 'AuthController'
+        });
 
-});
+    $urlRouterProvider.otherwise('home');
+
+}]);

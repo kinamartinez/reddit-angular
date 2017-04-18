@@ -2,9 +2,10 @@
     <span class="glyphicon glyphicon-thumbs-up" ng-click="upvote()"> </span>
     <span class="glyphicon glyphicon-thumbs-down" ng-click="downvote()"> </span> {{post.upvotes}}
     <span class="post-text">
-      {{post.text}} 
+      {{post.text}}
     </span> - by {{post.author}}
     <a ui-sref="comment({id: post._id})">comments</a>
+    <a ng-click="deletePost(post)"> Remove </a>
 </div>
 <form ng-submit="addPost()">
     <h3>Add a new post</h3>
