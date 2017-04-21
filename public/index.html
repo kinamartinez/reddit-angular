@@ -7,8 +7,8 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
-<body ng-app="rereddit">
-<nav class="navbar navbar-default navbar-static-top" ng-controller="NavCtrl">
+<body ng-app="rereddit" ng-controller="NavCtrl">
+<nav class="navbar navbar-default navbar-static-top" >
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse"
@@ -27,10 +27,11 @@
                 <li><a ui-sref="register" ng-hide="currentUser.username">Sign Up <i class="fa fa-user-plus"></i></a>
                 </li>
                 <li><a ui-sref="login" ng-hide="currentUser.username">Login <i class="fa fa-user"></i></a></li>
-                <li class="navbar-text"> Hi {{currentUser.username}} !</li>
+                <li class="navbar-text" ng-show="currentUser.username"> Hi {{currentUser.username}} !</li>
                 <li ng-show="currentUser.username" ng-click="logout()" class="fa fa-sign-out fa-2px navbar-text" aria-hidden="true">Log
                     Out
                 </li>
+
             </ul>
         </div>
     </div>

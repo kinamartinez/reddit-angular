@@ -1,20 +1,24 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-let commentSchema = new Schema({
+const commentSchema = new Schema({
     author:{type: String},
     body: {type: String},
     upvotes: {type: Number, default:0},
     post: {type: Schema.Types.ObjectId, ref: 'post'}
 });
 
-commentSchema.methods.upvote = function () {
+commentSchema.methods.upvoteComment = function () {
     this.upvotes +=1;
+};
+
+commentSchema.methods.downvoteComment = function () {
+    this.upvotes -=1;
 };
 
 let Comment = mongoose.model("comment", commentSchema);
 
-let postSchema = new Schema({
+const postSchema = new Schema({
     text: {type: String},
     author: String,
     upvotes: {type: Number, default:0},
@@ -22,6 +26,9 @@ let postSchema = new Schema({
 });
 postSchema.methods.upvote = function () {
     this.upvotes +=1;
+};
+postSchema.methods.downvote = function () {
+    this.upvotes -=1;
 };
 
 let Post = mongoose.model('post', postSchema);

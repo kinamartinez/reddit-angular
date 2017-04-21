@@ -5,9 +5,9 @@ app.controller('PostController', ["$scope", "postFactory", "posts", "$http", fun
 
 
     $scope.addPost = function () {
-        var newPost = {
+        let newPost = {
             text: $scope.text,
-            author: $scope.author,
+            //author: $scope.author,
             upvotes: $scope.upvotes,
             comments: [],
         };
@@ -17,15 +17,23 @@ app.controller('PostController', ["$scope", "postFactory", "posts", "$http", fun
         });
     };
 
-    $scope.upvote = function () {
-        postFactory.upvote().then(function () {
-             console.log("hey i like it");
-        })
 
+    $scope.upvote = function (post) {
+        postFactory.upvote(post).then(function () {
+            postFactory.getPosts().then(function (posts) {
+                $scope.posts = posts;
+                console.log("i like it")
+            });
+        });
     };
 
-    $scope.downvote = function () {
-
+    $scope.downvote = function (post) {
+        postFactory.downvote(post).then(function () {
+            postFactory.getPosts().then(function (posts) {
+                $scope.posts = posts;
+                console.log("i dislike it")
+            });
+        });
     };
 
     $scope.deletePost = function (postToRemove) {

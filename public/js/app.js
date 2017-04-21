@@ -21,7 +21,7 @@ app.config(["$stateProvider", "$urlRouterProvider", "$locationProvider", functio
             controller: 'CommentController',
             resolve: {
                 relevantPost: ["postFactory", "$stateParams", "$http", function (postFactory, $stateParams, $http) {
-                    var postId = $stateParams.id;
+                    let postId = $stateParams.id;
                     return $http.get("/post/" + postId).then(function (theWholePost) {
                         // console.log("the next obj comes from app.js");
                         // console.log(theWholePost.data);

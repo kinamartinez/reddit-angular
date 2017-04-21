@@ -14,6 +14,14 @@ const router = express.Router();
 const Post = require("../models/postModel").Post; // Esto es para acceder al schema que estamos exportando como un objeto
 const Comment = require("../models/postModel").Comment;
 
+
+const ensureAuthenticated = function (req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    } else {
+    }
+};
+
 //as we are using modular route handlers we use router.param an not app.param
 router.param('postid', function (req, res, next, id) {
     Post.findById(id, function (err, post) {
@@ -42,24 +50,8 @@ router.get('/', function (req, res, next) {
 
 });
 
-router.get('/:postid2', function (req, res, next) {
-    Post.findOne({_id: req.params.postid2}).populate('comments')
-        .exec(function (err, post) {
-        if (err) {
-            return next(err);
-        }
-          else {
-            console.log("the population stuff");
-            console.log(post);
-            res.send(post);
-        }
-    })
-  });
-
 
 router.post('/', function (req, res, next) {
-
-
     Post.create(Object.assign({author: req.user.username}, req.body), function (err, post) {
         if (err) {
             console.error(err);
@@ -71,10 +63,23 @@ router.post('/', function (req, res, next) {
     });
 });
 
-router.post('/:postid/comment', function (req, res, next) {
-    let newComment = new Comment(req.body);
-    // newComment.post = req.post._id;
-    // console.log(newComment);
+router.get('/:postid2', function (req, res, next) {
+    Post.findOne({_id: req.params.postid2}).populate('comments')
+        .exec(function (err, post) {
+            if (err) {
+                return next(err);
+            }
+            else {
+                // console.log("the population stuff");
+                // console.log(post);
+                res.send(post);
+            }
+        })
+});
+
+router.post('/:postid/comment', ensureAuthenticated, function (req, res, next) {
+    let newComment = new Comment(Object.assign({author: req.user.username}, req.body));
+
     newComment.save(function (err, commentWithId) {
         if (err) {
             return next(err);
@@ -92,14 +97,50 @@ router.post('/:postid/comment', function (req, res, next) {
 });
 
 
-router.put('/:postid/upvote', function (req, res) {
+router.put('/:postid/upvote', ensureAuthenticated, function (req, res) {
     req.post.upvote();
     req.post.save(function (err, post) {
         res.send(post);
     });
 });
 
-router.delete('/:postid', function (req, res, next) {
+router.put('/:postid/downvote', ensureAuthenticated, function (req, res) {
+    req.post.downvote();
+    req.post.save(function (err, post) {
+        res.send(post);
+    });
+});
+
+
+router.param('commentId', function (req, res, next, id) {
+    Comment.findById(id, function (err, comment) {
+        if (err) {
+            return next(err);
+        } else if (!comment) {
+            return next(new Error('Comment does not exist'));
+        } else {
+            req.comment = comment;  //put the post on the request object for the next function in line to use
+            return next();
+        }
+    });
+});
+
+router.put('/:commentId/commentupvote', ensureAuthenticated, function (req, res) {
+    req.comment.upvoteComment();
+    req.comment.save(function (err, comment) {
+        res.send(comment);
+    });
+});
+
+router.put('/:commentId/commentDownvote', ensureAuthenticated, function (req, res) {
+    req.comment.upvoteComment();
+    req.comment.save(function (err, comment) {
+        res.send(comment);
+    });
+});
+
+router.delete('/:postid', ensureAuthenticated, function (req, res, next) {
+
     req.post.remove(function (err, result) {
         if (err) {
             return next(err);
@@ -108,5 +149,6 @@ router.delete('/:postid', function (req, res, next) {
         }
     });
 });
+
 
 module.exports = router;

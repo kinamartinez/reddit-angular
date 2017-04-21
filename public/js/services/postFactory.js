@@ -21,9 +21,35 @@ app.factory('postFactory', function ($http) {
             })
     };
 
+    postFactory.getPosts = function () {
+        return $http.get('/post')
+            .then(function (response) {
+                return response.data
+            }, function (err) {
+                console.error(err)
+            });
+    };
+
+    postFactory.upvote = function (postToUpvote) {
+        return $http.put('/post/' + postToUpvote + '/upvote', null)
+            .then(function (response) {
+                return response.data;
+
+            }, function (err) {
+                console.error(err.data.message)
+            });
+    };
+
+    postFactory.downvote = function (postToDownvote) {
+        return $http.put('/post/' + postToDownvote + '/downvote', null)
+            .then(function (response) {
+                return response.data;
+
+            }, function (err) {
+                console.error(err.data.message)
+            });
+    };
     postFactory.addComment = function (newComment, postId) {
-        // console.log(newComment);
-        // console.log(post);
         return $http.post('/post/' + postId + '/comment', newComment)
             .then(function (response) {
                 return response.data;
@@ -32,19 +58,41 @@ app.factory('postFactory', function ($http) {
             })
     };
 
-    postFactory.upvote = function (postId, vote) {
-                return $http.post('/post/' + postId + '/upvote', vote)
+    postFactory.getComments = function () {
+        return $http.get('/comment')
             .then(function (response) {
-                console.log(vote);
-                return response.data;
-
+                console.log(response);
+                return response.data
             }, function (err) {
                 console.error(err)
             });
     };
 
+    postFactory.upvoteComment = function (commentToUpvote) {
+        console.log(commentToUpvote);
+        return $http.put('/post/' + commentToUpvote + '/commentupvote', null)
+            .then(function (response) {
+                console.log(response);
+                return response.data;
 
-return postFactory;
+            }, function (err) {
+                console.error(err.data.message)
+            });
+    };
+
+    postFactory.downvoteComment = function (commentToDownvote) {
+        console.log(commentToDownvote);
+        return $http.put('/post/' + commentToDownvote + '/commentDownvote', null)
+            .then(function (response) {
+                console.log(response);
+                return response.data;
+
+            }, function (err) {
+                console.error(err.data.message)
+            });
+    };
+
+    return postFactory;
 
 })
 ;
